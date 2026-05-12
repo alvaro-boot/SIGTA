@@ -8,8 +8,11 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Sin Google Fonts: funciona offline / redes que bloquean fonts.gstatic.com */
+  --font-sans: system-ui, ui-sans-serif, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "Segoe UI Mono", Menlo, Monaco, Consolas,
+    monospace;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +25,146 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* --- Login SIGTA / UTP (animaciones) --- */
+@keyframes sigta-login-bg-flow {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes sigta-login-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.96);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes sigta-login-grid {
+  0% {
+    transform: perspective(600px) rotateX(56deg) translateY(0);
+    opacity: 0.12;
+  }
+  100% {
+    transform: perspective(600px) rotateX(56deg) translateY(32px);
+    opacity: 0.2;
+  }
+}
+
+@keyframes sigta-login-orb {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.35;
+  }
+  33% {
+    transform: translate(24px, -18px) scale(1.08);
+    opacity: 0.55;
+  }
+  66% {
+    transform: translate(-16px, 12px) scale(0.95);
+    opacity: 0.4;
+  }
+}
+
+@keyframes sigta-login-scan {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.15;
+  }
+  92% {
+    opacity: 0.15;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+@keyframes sigta-login-shine {
+  0% {
+    transform: translateX(-120%) skewX(-12deg);
+  }
+  100% {
+    transform: translateX(220%) skewX(-12deg);
+  }
+}
+
+.sigta-login-bg {
+  background: linear-gradient(
+    118deg,
+    #0a3a42 0%,
+    #0f5c52 18%,
+    #1d8f6e 36%,
+    #3daf7a 48%,
+    #c9a227 58%,
+    #d9732b 72%,
+    #c94a32 86%,
+    #5c2748 100%
+  );
+  background-size: 320% 320%;
+  animation: sigta-login-bg-flow 22s ease-in-out infinite;
+}
+
+.sigta-login-grid {
+  background-image: linear-gradient(
+      rgba(255, 255, 255, 0.06) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+  animation: sigta-login-grid 14s linear infinite;
+}
+
+.sigta-login-card {
+  animation: sigta-login-card-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.sigta-login-orb {
+  animation: sigta-login-orb 12s ease-in-out infinite;
+}
+
+.sigta-login-orb-delay {
+  animation: sigta-login-orb 14s ease-in-out infinite;
+  animation-delay: -4s;
+}
+
+.sigta-login-scan {
+  animation: sigta-login-scan 8s linear infinite;
+}
+
+.sigta-login-btn-shine {
+  animation: sigta-login-shine 2.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sigta-login-bg,
+  .sigta-login-grid,
+  .sigta-login-orb,
+  .sigta-login-orb-delay,
+  .sigta-login-scan,
+  .sigta-login-btn-shine {
+    animation: none !important;
+  }
+
+  .sigta-login-card {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
 }
