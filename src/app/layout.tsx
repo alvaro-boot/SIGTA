@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'SIGTA',
-  description: 'Sistema de gestión de tutorías',
+  title: 'SIGTA · UTP',
+  description: 'Sistema de gestión de tutorías — Universidad Tecnológica de Pereira',
 };
 
 export default function RootLayout({
@@ -13,7 +13,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className="font-sans antialiased">{children}</body>
+      <body className="min-h-screen bg-slate-100 font-sans text-slate-900 antialiased">
+        {children}
+      </body>
     </html>
   );
 }

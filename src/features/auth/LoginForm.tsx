@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, ApiError } from '@/shared/lib/api';
 import { setToken, getRoleFromToken } from '@/shared/lib/auth';
+import { ui } from '@/shared/lib/ui-classes';
 
 type View = 'login' | 'register';
 
@@ -109,16 +110,16 @@ export function LoginForm() {
             SIGTA · Universidad Tecnológica de Pereira
           </p>
 
-          <div className="mt-6 flex rounded-xl border border-slate-200/80 bg-slate-50/80 p-1 text-sm font-medium text-slate-600">
+          <div className="mt-6 flex rounded-xl border border-slate-200/90 bg-slate-100/90 p-1 text-sm font-semibold text-slate-600 shadow-inner">
             <button
               type="button"
               onClick={() => {
                 setView('login');
                 setError(null);
               }}
-              className={`flex-1 rounded-lg py-2 transition-all ${
+              className={`flex-1 rounded-lg py-2.5 transition-all ${
                 view === 'login'
-                  ? 'bg-white text-slate-900 shadow-sm'
+                  ? 'bg-white text-teal-900 shadow-md ring-1 ring-slate-200/80'
                   : 'hover:text-slate-900'
               }`}
             >
@@ -130,9 +131,9 @@ export function LoginForm() {
                 setView('register');
                 setError(null);
               }}
-              className={`flex-1 rounded-lg py-2 transition-all ${
+              className={`flex-1 rounded-lg py-2.5 transition-all ${
                 view === 'register'
-                  ? 'bg-white text-slate-900 shadow-sm'
+                  ? 'bg-white text-teal-900 shadow-md ring-1 ring-slate-200/80'
                   : 'hover:text-slate-900'
               }`}
             >
@@ -147,8 +148,8 @@ export function LoginForm() {
 
           {view === 'login' ? (
             <form onSubmit={onLogin} className="mt-6 space-y-5">
-              <label className="block text-sm font-medium text-sky-900/90">
-                Correo electrónico
+              <label className="block space-y-1.5">
+                <span className={ui.label}>Correo electrónico</span>
                 <input
                   type="email"
                   required
@@ -156,19 +157,19 @@ export function LoginForm() {
                   placeholder="tu@correo.edu"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1.5 w-full rounded-lg border border-slate-300/90 bg-white/90 px-3.5 py-2.5 text-slate-900 shadow-inner outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/30"
+                  className={ui.field}
                 />
               </label>
 
-              <label className="block text-sm font-medium text-sky-900/90">
-                Contraseña
+              <label className="block space-y-1.5">
+                <span className={ui.label}>Contraseña</span>
                 <input
                   type="password"
                   required
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="mt-1.5 w-full rounded-lg border border-slate-300/90 bg-white/90 px-3.5 py-2.5 text-slate-900 shadow-inner outline-none transition-all duration-200 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/30"
+                  className={ui.field}
                 />
               </label>
 
@@ -203,8 +204,8 @@ export function LoginForm() {
             </form>
           ) : (
             <form onSubmit={onRegister} className="mt-6 space-y-5">
-              <label className="block text-sm font-medium text-sky-900/90">
-                Nombre completo
+              <label className="block space-y-1.5">
+                <span className={ui.label}>Nombre completo</span>
                 <input
                   type="text"
                   required
@@ -214,12 +215,12 @@ export function LoginForm() {
                   placeholder="Nombre y apellidos"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="mt-1.5 w-full rounded-lg border border-slate-300/90 bg-white/90 px-3.5 py-2.5 text-slate-900 shadow-inner outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/30"
+                  className={ui.field}
                 />
               </label>
 
-              <label className="block text-sm font-medium text-sky-900/90">
-                Correo electrónico
+              <label className="block space-y-1.5">
+                <span className={ui.label}>Correo electrónico</span>
                 <input
                   type="email"
                   required
@@ -227,12 +228,12 @@ export function LoginForm() {
                   placeholder="tu@correo.edu"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1.5 w-full rounded-lg border border-slate-300/90 bg-white/90 px-3.5 py-2.5 text-slate-900 shadow-inner outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/30"
+                  className={ui.field}
                 />
               </label>
 
-              <label className="block text-sm font-medium text-sky-900/90">
-                Contraseña (mín. 8 caracteres)
+              <label className="block space-y-1.5">
+                <span className={ui.label}>Contraseña (mín. 8 caracteres)</span>
                 <input
                   type="password"
                   required
@@ -240,7 +241,7 @@ export function LoginForm() {
                   minLength={8}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="mt-1.5 w-full rounded-lg border border-slate-300/90 bg-white/90 px-3.5 py-2.5 text-slate-900 shadow-inner outline-none transition-all duration-200 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/30"
+                  className={ui.field}
                 />
               </label>
 

@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { api, ApiError } from '@/shared/lib/api';
 import type { Subject } from '@/features/student/RequestTutoringForm';
+import { Card } from '@/shared/components/Card';
+import { ui } from '@/shared/lib/ui-classes';
 
 export function SubjectsPanel() {
   const [rows, setRows] = useState<Subject[]>([]);
@@ -30,7 +32,7 @@ export function SubjectsPanel() {
       setCode('');
       load();
     } catch (ex) {
-      setErr(ex instanceof ApiError ? ex.body ?? ex.message : 'Error');
+      setErr(ex instanceof ApiError ? ex.getDetail() : 'Error');
     }
   }
 
@@ -40,51 +42,60 @@ export function SubjectsPanel() {
       await api(`/subjects/${id}`, { method: 'DELETE' });
       load();
     } catch (ex) {
-      setErr(ex instanceof ApiError ? ex.body ?? ex.message : 'Error');
+      setErr(ex instanceof ApiError ? ex.getDetail() : 'Error');
     }
   }
 
   return (
-    <section className="space-y-3 rounded-lg border border-zinc-200 bg-white p-4">
-      <h2 className="font-medium text-zinc-800">Asignaturas</h2>
-      <form onSubmit={create} className="flex flex-wrap gap-2 text-sm">
-        <input
-          placeholder="Nombre"
-          required
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="rounded-md border border-zinc-300 px-3 py-2"
-        />
-        <input
-          placeholder="Código (opcional)"
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          className="rounded-md border border-zinc-300 px-3 py-2"
-        />
-        <button
-          type="submit"
-          className="rounded-md bg-emerald-700 px-3 py-2 text-white"
-        >
+    <Card
+      title="Catálogo de asignaturas"
+      description="Materias disponibles para especialidades y solicitudes de tutoría."
+    >
+      <form onSubmit={create} className="mb-8 flex flex-wrap items-end gap-3">
+        <div className="min-w-[10rem] flex-1 space-y-1.5">
+          <span className={ui.label}>Nombre</span>
+          <input
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className={ui.field}
+          />
+        </div>
+        <div className="min-w-[8rem] space-y-1.5">
+          <span className={ui.label}>Código (opc.)</span>
+          <input
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            className={ui.field}
+          />
+        </div>
+        <button type="submit" className={ui.btnPrimary}>
           Crear
         </button>
       </form>
-      {err && <p className="text-sm text-red-600">{err}</p>}
-      <ul className="divide-y divide-zinc-100 text-sm">
+      {err && (
+        <p className="mb-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+          {err}
+        </p>
+      )}
+      <ul className="space-y-2">
         {rows.map((s) => (
-          <li key={s.id} className="flex items-center justify-between py-2">
-            <span>
-              {s.name} {s.code ? <span className="text-zinc-500">({s.code})</span> : null}
+          <li
+            key={s.id}
+            className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/50 px-4 py-3"
+          >
+            <span className="font-medium text-slate-900">
+              {s.name}
+              {s.code ? (
+                <span className="ml-2 text-sm font-normal text-slate-500">({s.code})</span>
+              ) : null}
             </span>
-            <button
-              type="button"
-              className="text-red-600 hover:underline"
-              onClick={() => remove(s.id)}
-            >
+            <button type="button" className={ui.btnDanger} onClick={() => remove(s.id)}>
               Eliminar
             </button>
           </li>
         ))}
       </ul>
-    </section>
+    </Card>
   );
 }

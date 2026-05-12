@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getToken, getRoleFromToken } from '@/shared/lib/auth';
+import { LoadingScreen } from '@/shared/components/LoadingScreen';
 
 export default function Home() {
   const router = useRouter();
@@ -20,9 +21,5 @@ export default function Home() {
     else router.replace('/login');
   }, [router]);
 
-  return (
-    <p className="p-8 text-center text-zinc-500" lang="es">
-      Cargando…
-    </p>
-  );
+  return <LoadingScreen message="Redirigiendo…" />;
 }

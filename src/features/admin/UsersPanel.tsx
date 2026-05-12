@@ -3,6 +3,9 @@
 import { useEffect, useState } from 'react';
 import { api, ApiError } from '@/shared/lib/api';
 import type { UserRole } from '@/shared/lib/auth';
+import { Card } from '@/shared/components/Card';
+import { RoleBadge } from '@/shared/components/Badge';
+import { ui } from '@/shared/lib/ui-classes';
 
 type UserRow = {
   id: number;
@@ -41,67 +44,88 @@ export function UsersPanel() {
       setFullName('');
       load();
     } catch (ex) {
-      setErr(ex instanceof ApiError ? ex.body ?? ex.message : 'Error');
+      setErr(ex instanceof ApiError ? ex.getDetail() : 'Error');
     }
   }
 
   return (
-    <section className="space-y-4 rounded-lg border border-zinc-200 bg-white p-4">
-      <h2 className="font-medium text-zinc-800">Usuarios</h2>
-      <form onSubmit={create} className="grid gap-2 text-sm sm:grid-cols-2">
-        <input
-          placeholder="Email"
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="rounded-md border border-zinc-300 px-3 py-2"
-        />
-        <input
-          placeholder="Contraseña (mín. 8)"
-          type="password"
-          required
-          minLength={8}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="rounded-md border border-zinc-300 px-3 py-2"
-        />
-        <input
-          placeholder="Nombre completo"
-          required
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          className="rounded-md border border-zinc-300 px-3 py-2"
-        />
-        <select
-          value={role}
-          onChange={(e) => setRole(e.target.value as UserRole)}
-          className="rounded-md border border-zinc-300 px-3 py-2"
-        >
-          <option value="STUDENT">Estudiante</option>
-          <option value="PROFESSOR">Profesor</option>
-          <option value="ADMIN">Administrador</option>
-        </select>
-        <button
-          type="submit"
-          className="rounded-md bg-emerald-700 px-3 py-2 text-white sm:col-span-2"
-        >
+    <Card
+      title="Usuarios del sistema"
+      description="Crea cuentas de estudiante, profesor u administrador. El registro público solo crea estudiantes."
+    >
+      <form onSubmit={create} className="mb-10 grid gap-4 sm:grid-cols-2">
+        <div className="sm:col-span-2 space-y-1.5">
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="correo@utp.edu.co"
+            className={ui.field}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <input
+            type="password"
+            required
+            minLength={8}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className={ui.field}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value as UserRole)}
+            className={ui.field}
+          >
+            <option value="STUDENT">Estudiante</option>
+            <option value="PROFESSOR">Profesor</option>
+            <option value="ADMIN">Administrador</option>
+          </select>
+        </div>
+        <div className="sm:col-span-2 space-y-1.5">
+          <input
+            required
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            className={ui.field}
+          />
+        </div>
+        <button type="submit" className={`${ui.btnPrimary} sm:col-span-2`}>
           Crear usuario
         </button>
       </form>
-      {err && <p className="text-sm text-red-600">{err}</p>}
-      <ul className="divide-y divide-zinc-100 text-sm">
+      {err && (
+        <p className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+          {err}
+        </p>
+      )}
+      <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">
+        Listado ({rows.length})
+      </h3>
+      <div className="space-y-2">
         {rows.map((u) => (
-          <li key={u.id} className="flex flex-wrap justify-between gap-2 py-2">
-            <span>
-              {u.fullName} <span className="text-zinc-500">({u.email})</span>
-            </span>
-            <span className="text-zinc-600">
-              {u.role} {u.isActive ? '' : '(inactivo)'}
-            </span>
-          </li>
+          <div
+            key={u.id}
+            className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-3"
+          >
+            <div>
+              <p className="font-semibold text-slate-900">{u.fullName}</p>
+              <p className="text-sm text-slate-500">{u.email}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <RoleBadge role={u.role} />
+              {!u.isActive && (
+                <span className="rounded-md bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">
+                  Inactivo
+                </span>
+              )}
+            </div>
+          </div>
         ))}
-      </ul>
-    </section>
+      </div>
+    </Card>
   );
 }

@@ -23,8 +23,7 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  margin: 0;
 }
 
 /* --- Login SIGTA / UTP (animaciones) --- */

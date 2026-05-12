@@ -3,10 +3,12 @@
 import { useEffect, useState } from 'react';
 import { api, ApiError } from '@/shared/lib/api';
 import type { Subject } from '@/features/student/RequestTutoringForm';
+import { Card } from '@/shared/components/Card';
+import { ui } from '@/shared/lib/ui-classes';
 
 type Row = { id: number; subjectId: number; subject: Subject };
 
-export function SpecialtiesPanel() {
+export function SpecialtiesPanel({ onChanged }: { onChanged?: () => void }) {
   const [rows, setRows] = useState<Row[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [subjectId, setSubjectId] = useState('');
@@ -31,8 +33,9 @@ export function SpecialtiesPanel() {
       });
       setSubjectId('');
       load();
+      onChanged?.();
     } catch (ex) {
-      setErr(ex instanceof ApiError ? ex.body ?? ex.message : 'Error');
+      setErr(ex instanceof ApiError ? ex.getDetail() : 'Error');
     }
   }
 
@@ -41,49 +44,60 @@ export function SpecialtiesPanel() {
     try {
       await api(`/professor/specialties/${subjectId}`, { method: 'DELETE' });
       load();
+      onChanged?.();
     } catch (ex) {
-      setErr(ex instanceof ApiError ? ex.body ?? ex.message : 'Error');
+      setErr(ex instanceof ApiError ? ex.getDetail() : 'Error');
     }
   }
 
   return (
-    <section className="space-y-3 rounded-lg border border-zinc-200 bg-white p-4">
-      <h2 className="font-medium text-zinc-800">Asignaturas en las que me especializo</h2>
-      <form onSubmit={add} className="flex flex-wrap items-end gap-2">
-        <select
-          value={subjectId}
-          onChange={(e) => setSubjectId(e.target.value)}
-          className="rounded-md border border-zinc-300 px-3 py-2 text-sm"
-        >
-          <option value="">Añadir…</option>
-          {subjects.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name}
-            </option>
-          ))}
-        </select>
-        <button
-          type="submit"
-          className="rounded-md bg-emerald-700 px-3 py-2 text-sm text-white"
-        >
+    <Card
+      title="Especialidades"
+      description="Asignaturas en las que puedes impartir tutoría. Los estudiantes solo podrán solicitar materias que tengas aquí."
+    >
+      <form onSubmit={add} className="mb-6 flex flex-wrap items-end gap-3">
+        <div className="min-w-[12rem] flex-1 space-y-1.5">
+          <span className={ui.label}>Añadir materia</span>
+          <select
+            value={subjectId}
+            onChange={(e) => setSubjectId(e.target.value)}
+            className={ui.field}
+          >
+            <option value="">Seleccionar…</option>
+            {subjects.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <button type="submit" className={ui.btnPrimary}>
           Añadir
         </button>
       </form>
-      {err && <p className="text-sm text-red-600">{err}</p>}
-      <ul className="divide-y divide-zinc-100 text-sm">
+      {err && (
+        <p className="mb-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+          {err}
+        </p>
+      )}
+      <ul className="space-y-2">
         {rows.map((r) => (
-          <li key={r.id} className="flex items-center justify-between py-2">
-            <span>{r.subject?.name}</span>
-            <button
-              type="button"
-              className="text-red-600 hover:underline"
-              onClick={() => remove(r.subjectId)}
-            >
+          <li
+            key={r.id}
+            className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/50 px-4 py-3 transition hover:border-teal-100 hover:bg-teal-50/30"
+          >
+            <span className="font-medium text-slate-900">{r.subject?.name}</span>
+            <button type="button" className={ui.btnDanger} onClick={() => remove(r.subjectId)}>
               Quitar
             </button>
           </li>
         ))}
+        {!rows.length && (
+          <li className="rounded-xl border border-dashed border-slate-200 py-8 text-center text-sm text-slate-500">
+            Aún no has añadido especialidades.
+          </li>
+        )}
       </ul>
-    </section>
+    </Card>
   );
 }

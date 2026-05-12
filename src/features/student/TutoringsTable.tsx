@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '@/shared/lib/api';
+import { Card } from '@/shared/components/Card';
+import { StatusBadge } from '@/shared/components/Badge';
 
 export type TutoringRow = {
   id: number;
@@ -12,7 +14,17 @@ export type TutoringRow = {
   professor?: { fullName: string } | null;
 };
 
-export function TutoringsTable({ refreshKey }: { refreshKey: number }) {
+type Props = {
+  refreshKey: number;
+  title?: string;
+  description?: string;
+};
+
+export function TutoringsTable({
+  refreshKey,
+  title = 'Tutorías',
+  description = 'Listado de sesiones registradas en el sistema.',
+}: Props) {
   const [rows, setRows] = useState<TutoringRow[]>([]);
 
   useEffect(() => {
@@ -20,36 +32,59 @@ export function TutoringsTable({ refreshKey }: { refreshKey: number }) {
   }, [refreshKey]);
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white">
-      <table className="min-w-full text-left text-sm">
-        <thead className="border-b border-zinc-200 bg-zinc-50">
-          <tr>
-            <th className="px-3 py-2">Asignatura</th>
-            <th className="px-3 py-2">Inicio</th>
-            <th className="px-3 py-2">Fin</th>
-            <th className="px-3 py-2">Estado</th>
-            <th className="px-3 py-2">Profesor</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={r.id} className="border-b border-zinc-100">
-              <td className="px-3 py-2">{r.subject?.name ?? '—'}</td>
-              <td className="px-3 py-2">{new Date(r.startAt).toLocaleString()}</td>
-              <td className="px-3 py-2">{new Date(r.endAt).toLocaleString()}</td>
-              <td className="px-3 py-2">{r.status}</td>
-              <td className="px-3 py-2">{r.professor?.fullName ?? '—'}</td>
+    <Card title={title} description={description}>
+      <div className="overflow-x-auto rounded-xl border border-slate-100 bg-slate-50/40">
+        <table className="min-w-full text-left text-sm">
+          <thead>
+            <tr className="border-b border-slate-200 bg-white/90 text-xs font-bold uppercase tracking-wider text-slate-500">
+              <th className="px-4 py-3">Asignatura</th>
+              <th className="px-4 py-3">Inicio</th>
+              <th className="px-4 py-3">Fin</th>
+              <th className="px-4 py-3">Estado</th>
+              <th className="px-4 py-3">Profesor</th>
             </tr>
-          ))}
-          {!rows.length && (
-            <tr>
-              <td colSpan={5} className="px-3 py-4 text-zinc-500">
-                No hay tutorías aún.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody className="divide-y divide-slate-100 bg-white">
+            {rows.map((r) => (
+              <tr
+                key={r.id}
+                className="transition-colors hover:bg-teal-50/40"
+              >
+                <td className="px-4 py-3 font-medium text-slate-900">
+                  {r.subject?.name ?? '—'}
+                </td>
+                <td className="px-4 py-3 text-slate-600 tabular-nums">
+                  {new Date(r.startAt).toLocaleString()}
+                </td>
+                <td className="px-4 py-3 text-slate-600 tabular-nums">
+                  {new Date(r.endAt).toLocaleString()}
+                </td>
+                <td className="px-4 py-3">
+                  <StatusBadge status={r.status} />
+                </td>
+                <td className="px-4 py-3 text-slate-700">
+                  {r.professor?.fullName ?? (
+                    <span className="text-slate-400">—</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+            {!rows.length && (
+              <tr>
+                <td
+                  colSpan={5}
+                  className="px-4 py-14 text-center text-sm text-slate-500"
+                >
+                  <span className="mb-2 block text-sm font-medium text-slate-400">
+                    Sin tutorías aún
+                  </span>
+                  Las solicitudes que envíes aparecerán aquí.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </Card>
   );
 }

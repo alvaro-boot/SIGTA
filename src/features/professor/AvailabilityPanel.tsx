@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { api, ApiError } from '@/shared/lib/api';
+import { Card } from '@/shared/components/Card';
+import { ui } from '@/shared/lib/ui-classes';
 
 type Av = {
   id: number;
@@ -12,7 +14,7 @@ type Av = {
 
 const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
-export function AvailabilityPanel() {
+export function AvailabilityPanel({ onChanged }: { onChanged?: () => void }) {
   const [rows, setRows] = useState<Av[]>([]);
   const [dayOfWeek, setDayOfWeek] = useState(1);
   const [startTime, setStartTime] = useState('09:00');
@@ -36,8 +38,9 @@ export function AvailabilityPanel() {
         body: JSON.stringify({ dayOfWeek, startTime, endTime }),
       });
       load();
+      onChanged?.();
     } catch (ex) {
-      setErr(ex instanceof ApiError ? ex.body ?? ex.message : 'Error');
+      setErr(ex instanceof ApiError ? ex.getDetail() : 'Error');
     }
   }
 
@@ -46,24 +49,26 @@ export function AvailabilityPanel() {
     try {
       await api(`/professor/availability/${id}`, { method: 'DELETE' });
       load();
+      onChanged?.();
     } catch (ex) {
-      setErr(ex instanceof ApiError ? ex.body ?? ex.message : 'Error');
+      setErr(ex instanceof ApiError ? ex.getDetail() : 'Error');
     }
   }
 
   return (
-    <section className="space-y-3 rounded-lg border border-zinc-200 bg-white p-4">
-      <h2 className="font-medium text-zinc-800">Disponibilidad semanal (UTC)</h2>
-      <p className="text-xs text-zinc-500">
-        El día y la hora deben coincidir con lo que solicitan los estudiantes en UTC.
-      </p>
-      <form onSubmit={add} className="flex flex-wrap items-end gap-2 text-sm">
-        <label>
-          Día
+    <Card
+      title="Disponibilidad semanal"
+      description="Define franjas por día (referencia UTC). Deben cubrir la hora completa de la tutoría que solicite un estudiante."
+    >
+      <form
+        onSubmit={add}
+        className="mb-6 flex flex-wrap items-end gap-4 border-b border-slate-100 pb-6"
+      >
+        <div className="space-y-1.5">
           <select
             value={dayOfWeek}
             onChange={(e) => setDayOfWeek(Number(e.target.value))}
-            className="ml-1 rounded-md border border-zinc-300 px-2 py-1"
+            className={`${ui.field} min-w-[7rem]`}
           >
             {days.map((d, i) => (
               <option key={d} value={i}>
@@ -71,49 +76,55 @@ export function AvailabilityPanel() {
               </option>
             ))}
           </select>
-        </label>
-        <label>
-          Desde
+        </div>
+        <div className="space-y-1.5">
           <input
             type="time"
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
-            className="ml-1 rounded-md border border-zinc-300 px-2 py-1"
+            className={`${ui.field} w-auto`}
           />
-        </label>
-        <label>
-          Hasta
+        </div>
+        <div className="space-y-1.5">
           <input
             type="time"
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
-            className="ml-1 rounded-md border border-zinc-300 px-2 py-1"
+            className={`${ui.field} w-auto`}
           />
-        </label>
-        <button
-          type="submit"
-          className="rounded-md bg-emerald-700 px-3 py-2 text-white"
-        >
+        </div>
+        <button type="submit" className={ui.btnPrimary}>
           Añadir franja
         </button>
       </form>
-      {err && <p className="text-sm text-red-600">{err}</p>}
-      <ul className="divide-y divide-zinc-100 text-sm">
+      {err && (
+        <p className="mb-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+          {err}
+        </p>
+      )}
+      <ul className="space-y-2">
         {rows.map((r) => (
-          <li key={r.id} className="flex items-center justify-between py-2">
-            <span>
-              {days[r.dayOfWeek]} {r.startTime}–{r.endTime}
+          <li
+            key={r.id}
+            className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/50 px-4 py-3"
+          >
+            <span className="font-medium text-slate-800">
+              <span className="text-teal-700">{days[r.dayOfWeek]}</span>{' '}
+              <span className="tabular-nums text-slate-600">
+                {r.startTime} – {r.endTime}
+              </span>
             </span>
-            <button
-              type="button"
-              className="text-red-600 hover:underline"
-              onClick={() => remove(r.id)}
-            >
+            <button type="button" className={ui.btnDanger} onClick={() => remove(r.id)}>
               Quitar
             </button>
           </li>
         ))}
+        {!rows.length && (
+          <li className="rounded-xl border border-dashed border-slate-200 py-8 text-center text-sm text-slate-500">
+            No hay franjas registradas.
+          </li>
+        )}
       </ul>
-    </section>
+    </Card>
   );
 }

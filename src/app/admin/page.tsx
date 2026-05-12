@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppShell, requireRoleClient } from '@/shared/components/AppShell';
+import { PageHero } from '@/shared/components/PageHero';
+import { LoadingScreen } from '@/shared/components/LoadingScreen';
 import { UsersPanel } from '@/features/admin/UsersPanel';
 import { SubjectsPanel } from '@/features/admin/SubjectsPanel';
 import { SettingsPanel } from '@/features/admin/SettingsPanel';
@@ -19,15 +21,21 @@ export default function AdminPage() {
     setOk(true);
   }, [router]);
 
-  if (!ok) return <p className="p-8 text-center text-zinc-500">Cargando…</p>;
+  if (!ok) return <LoadingScreen />;
 
   return (
     <AppShell role="ADMIN">
-      <h1 className="mb-6 text-2xl font-semibold text-zinc-900">Panel administrador</h1>
+      <PageHero
+        eyebrow="Administración"
+        title="Panel de configuración"
+        description="Usuarios del sistema, catálogo de asignaturas y parámetros generales de SIGTA."
+      />
       <div className="grid gap-8">
         <UsersPanel />
-        <SubjectsPanel />
-        <SettingsPanel />
+        <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
+          <SubjectsPanel />
+          <SettingsPanel />
+        </div>
       </div>
     </AppShell>
   );

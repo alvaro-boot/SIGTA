@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { api, ApiError } from '@/shared/lib/api';
+import { Card } from '@/shared/components/Card';
+import { ui } from '@/shared/lib/ui-classes';
 
 export type Subject = { id: number; name: string; code: string | null };
 
@@ -21,7 +23,8 @@ export function RequestTutoringForm({ onCreated }: { onCreated: () => void }) {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [subjectId, setSubjectId] = useState('');
   const [startLocal, setStartLocal] = useState('');
-  const [msg, setMsg] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const endPreview = useMemo(() => formatLocalEnd(startLocal), [startLocal]);
@@ -34,7 +37,8 @@ export function RequestTutoringForm({ onCreated }: { onCreated: () => void }) {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setMsg(null);
+    setSuccess(null);
+    setError(null);
     setLoading(true);
     try {
       const sid = Number(subjectId);
@@ -43,10 +47,12 @@ export function RequestTutoringForm({ onCreated }: { onCreated: () => void }) {
         method: 'POST',
         body: JSON.stringify({ subjectId: sid, startAt }),
       });
-      setMsg('Solicitud registrada (duración: 1 hora).');
+      setSuccess('Solicitud registrada correctamente (1 hora).');
+      setError(null);
       onCreated();
     } catch (err) {
-      setMsg(
+      setSuccess(null);
+      setError(
         err instanceof ApiError ? err.getDetail() : 'Error al solicitar tutoría',
       );
     } finally {
@@ -55,53 +61,70 @@ export function RequestTutoringForm({ onCreated }: { onCreated: () => void }) {
   }
 
   return (
-    <form
-      onSubmit={submit}
-      className="space-y-3 rounded-lg border border-zinc-200 bg-white p-4"
+    <Card
+      title="Nueva solicitud"
+      description="Elige materia y hora de inicio. La sesión siempre dura exactamente una hora; el sistema buscará un profesor disponible."
     >
-      <h2 className="font-medium text-zinc-800">Nueva solicitud</h2>
-      <p className="text-xs text-zinc-500">
-        Cada tutoría tiene una duración fija de <strong>1 hora</strong>. Indica solo el
-        inicio; el fin se calcula automáticamente.
-      </p>
-      <label className="block text-sm">
-        <span className="text-zinc-600">Asignatura</span>
-        <select
-          required
-          value={subjectId}
-          onChange={(e) => setSubjectId(e.target.value)}
-          className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2"
-        >
-          <option value="">Seleccione…</option>
-          {subjects.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="block text-sm">
-        <span className="text-zinc-600">Inicio (hora local)</span>
-        <input
-          type="datetime-local"
-          required
-          value={startLocal}
-          onChange={(e) => setStartLocal(e.target.value)}
-          className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2"
-        />
-      </label>
-      <div className="rounded-md border border-dashed border-zinc-300 bg-zinc-50 px-3 py-2 text-sm text-zinc-700">
-        <span className="text-zinc-500">Fin (1 h después): </span>
-        <span className="font-medium text-zinc-900">{endPreview}</span>
-      </div>
-      {msg && <p className="text-sm text-zinc-700">{msg}</p>}
-      <button
-        type="submit"
-        disabled={loading}
-        className="rounded-md bg-emerald-700 px-3 py-2 text-sm text-white hover:bg-emerald-800 disabled:opacity-60"
-      >
-        Enviar
-      </button>
-    </form>
+      <form onSubmit={submit} className="space-y-5">
+        <div className="space-y-1.5">
+          <span className={ui.label}>Asignatura</span>
+          <select
+            required
+            value={subjectId}
+            onChange={(e) => setSubjectId(e.target.value)}
+            className={ui.field}
+          >
+            <option value="">Seleccione una asignatura…</option>
+            {subjects.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+                {s.code ? ` (${s.code})` : ''}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="space-y-1.5">
+          <span className={ui.label}>Inicio (hora local)</span>
+          <input
+            type="datetime-local"
+            required
+            value={startLocal}
+            onChange={(e) => setStartLocal(e.target.value)}
+            className={ui.field}
+          />
+        </div>
+
+        <div className="rounded-xl border border-dashed border-teal-200/80 bg-gradient-to-br from-teal-50/80 to-emerald-50/40 px-4 py-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-teal-800">
+            Fin calculado (1 h después)
+          </p>
+          <p className="mt-1 text-lg font-semibold tabular-nums text-slate-900">
+            {endPreview}
+          </p>
+        </div>
+
+        {success && (
+          <p
+            className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900"
+            role="status"
+          >
+            {success}
+          </p>
+        )}
+        {error && (
+          <p
+            className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+            role="alert"
+          >
+            {error}
+          </p>
+        )}
+
+        <button type="submit" disabled={loading} className={`${ui.btnPrimary} w-full`}>
+          {loading ? 'Enviando…' : 'Enviar solicitud'}
+        </button>
+      </form>
+    </Card>
   );
 }
