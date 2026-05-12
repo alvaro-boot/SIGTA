@@ -58,7 +58,7 @@ export function AvailabilityPanel({ onChanged }: { onChanged?: () => void }) {
   return (
     <Card
       title="Disponibilidad semanal"
-      description="Define franjas por día (referencia UTC). Deben cubrir la hora completa de la tutoría que solicite un estudiante."
+      description="Define franjas por día y hora en la zona horaria del sistema (APP_TIMEZONE en el servidor). La franja debe cubrir toda la hora de la tutoría."
     >
       <form
         onSubmit={add}
