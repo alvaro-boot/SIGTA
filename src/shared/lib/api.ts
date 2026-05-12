@@ -1,5 +1,4 @@
-const baseUrl = () =>
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '') || 'http://localhost:3001';
+import { getBackendBaseUrl } from '@/shared/config/backend-url';
 
 export class ApiError extends Error {
   constructor(
@@ -39,7 +38,7 @@ export async function api<T>(
     headers.set('Content-Type', 'application/json');
   }
   if (token) headers.set('Authorization', `Bearer ${token}`);
-  const res = await fetch(`${baseUrl()}${path}`, { ...init, headers });
+  const res = await fetch(`${getBackendBaseUrl()}${path}`, { ...init, headers });
   const text = await res.text();
   if (!res.ok) {
     throw new ApiError(res.statusText, res.status, text);
