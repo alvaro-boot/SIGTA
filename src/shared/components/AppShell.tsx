@@ -21,10 +21,18 @@ export function AppShell({
   }
 
   const links: { href: string; label: string; roles: UserRole[] }[] = [
-    { href: '/student', label: 'Estudiante', roles: ['STUDENT'] },
+    { href: '/student', label: 'Inicio', roles: ['STUDENT'] },
+    { href: '/student/profesores', label: 'Profesores', roles: ['STUDENT'] },
     { href: '/professor', label: 'Profesor', roles: ['PROFESSOR'] },
     { href: '/admin', label: 'Administración', roles: ['ADMIN'] },
   ];
+
+  function navActive(href: string): boolean {
+    if (href === '/student') {
+      return pathname === '/student';
+    }
+    return pathname === href || pathname.startsWith(`${href}/`);
+  }
 
   const visible = links.filter((l) => l.roles.includes(role));
 
@@ -69,7 +77,7 @@ export function AppShell({
               aria-label="Principal"
             >
               {visible.map((l) => {
-                const active = pathname === l.href;
+                const active = navActive(l.href);
                 return (
                   <Link
                     key={l.href}

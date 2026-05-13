@@ -38,7 +38,7 @@ export function SettingsPanel() {
   return (
     <Card
       title="Parámetros del sistema"
-      description="Pares clave / valor para textos o flags de configuración."
+      description="Pares clave / valor. Para tutorías: usa la clave tutoring_cancel_min_hours_before con un número (horas mínimas antes del inicio para que el estudiante pueda cancelar o reprogramar; por defecto el backend usa 24 si no existe)."
     >
       <form onSubmit={save} className="mb-8 flex flex-wrap items-end gap-3">
         <div className="min-w-[8rem] space-y-1.5">

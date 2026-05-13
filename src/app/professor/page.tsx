@@ -6,7 +6,9 @@ import { AppShell, requireRoleClient } from '@/shared/components/AppShell';
 import { PageHero } from '@/shared/components/PageHero';
 import { LoadingScreen } from '@/shared/components/LoadingScreen';
 import { SpecialtiesPanel } from '@/features/professor/SpecialtiesPanel';
+import { ProfessorProfilePanel } from '@/features/professor/ProfessorProfilePanel';
 import { AvailabilityPanel } from '@/features/professor/AvailabilityPanel';
+import { UnassignedQueuePanel } from '@/features/professor/UnassignedQueuePanel';
 import { TutoringsTable } from '@/features/student/TutoringsTable';
 
 export default function ProfessorPage() {
@@ -28,18 +30,22 @@ export default function ProfessorPage() {
     <AppShell role="PROFESSOR">
       <PageHero
         eyebrow="Portal docente"
-        title="Gestión de disponibilidad"
-        description="Indica en qué materias puedes tutorar y las franjas horarias en las que aceptas sesiones. Las solicitudes de estudiantes se asignan automáticamente cuando coinciden."
+        title="Disponibilidad y perfil"
+        description="Completa tu perfil público, indica materias y franjas presenciales o virtuales. Las solicitudes de estudiantes se asignan cuando coinciden materia, modalidad y horario."
       />
       <div className="grid gap-8">
+        <ProfessorProfilePanel onSaved={() => setTableKey((k) => k + 1)} />
         <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
           <SpecialtiesPanel onChanged={() => setTableKey((k) => k + 1)} />
           <AvailabilityPanel onChanged={() => setTableKey((k) => k + 1)} />
         </div>
+        <UnassignedQueuePanel onClaimed={() => setTableKey((k) => k + 1)} />
         <TutoringsTable
           refreshKey={tableKey}
-          title="Tutorías asignadas"
-          description="Sesiones de una hora que el sistema te ha asignado."
+          mode="professor"
+          onMutate={() => setTableKey((k) => k + 1)}
+          title="Mis tutorías asignadas"
+          description="Confirma las pendientes, devuelve a cola si no puedes, y marca como realizadas las ya impartidas."
         />
       </div>
     </AppShell>
